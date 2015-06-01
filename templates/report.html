@@ -1,0 +1,146 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style type="text/css">
+        .minorText{color:#bababa;}
+        .b, .b tr, .b td{border-collapse: collapse !important; border: 1px solid black !important; padding: 5px;}
+        .tableHeader{ background-color: #f0f0f0}
+        .c{text-align: center}
+        .l{text-align: left}
+        .r{text-align: right}
+        .shrd{font-size:14pt;}
+        .nob
+        {
+            border:none;
+            border-collapse:collapse;
+        }
+        .nob td, .nob tr
+        {
+            border:none;
+            outline:none;
+        }
+    </style>
+    {% macro showMinorValue(value) -%}
+    {% if (value) != 0 %}<span class="minorText">({{ '%0.2f' % (value) }})</span>{% endif %}
+    {%- endmacro %}
+</head>
+<body>
+<div class="shrd">Суммарные данные по командам</div>
+<table class="b">
+    <tr class="tableHeader">
+        <td>Команда</td>
+        <td>Население</td>
+        <td>Промышленность</td>
+        <td>SUM(L_расы*sum_техов_расы)</td>
+    </tr>
+    {% for c in commandStats %}
+    <tr>
+        <td>{{ c.commandName }}</td>
+        <td>{{ '%0.2f' % c.pop }}{{ showMinorValue(c.pop - c.prevpop) }}</td>
+        <td>{{ '%0.2f' % c.ind }}{{ showMinorValue(c.ind - c.prevind) }}</td>
+        <td>{{ '%0.2f' % c.rating }}{{ showMinorValue(c.rating - c.prevrating) }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<br />
+<div class="shrd">Средние уровни технологий на которых команды строят корабли</div>
+<table class="b">
+    <tr class="tableHeader">
+        <td>Команда</td>
+        <td>Двигатели</td>
+        <td>Оружие</td>
+        <td>Защита</td>
+        <td>Грузы</td>
+        <td>Боеспособных рас</td>
+    </tr>
+    {% for c in commandStats %}
+    <tr>
+        <td>{{ c.commandName }}</td>
+        <td>{{ '%0.2f' % (c.dt / c.cnt) }}{{ showMinorValue(c.dt / c.cnt - c.prevdt / c.prevcnt) }}</td>
+        <td>{{ '%0.2f' % (c.wt / c.cnt) }}{{ showMinorValue(c.wt / c.cnt - c.prevwt / c.prevcnt) }}</td>
+        <td>{{ '%0.2f' % (c.st / c.cnt) }}{{ showMinorValue(c.st / c.cnt - c.prevst / c.prevcnt) }}</td>
+        <td>{{ '%0.2f' % (c.ct / c.cnt) }}{{ showMinorValue(c.ct / c.cnt - c.prevct / c.prevcnt) }}</td>
+        <td class="c">{{ c.cnt }}{{ showMinorValue(c.cnt - c.prevcnt) }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<br />
+<div class="shrd">Суммарные данные по массе</div>
+<table class="b">
+    <tr class="tableHeader">
+        <td>Команда</td>
+        <td>Построено</td>
+        <td>Погибло</td>
+        <td>Процент погибших</td>
+    </tr>
+    {% for c in commandStats %}
+    <tr>
+        <td>{{ c.commandName }}</td>
+        <td>{{ '%0.2f' % c.mass }}{{ showMinorValue(c.mass - c.prevMass) }}</td>
+        <td>{{ '%0.2f' % c.destroyedMass }}{{ showMinorValue(c.destroyedMass - c.prevDestroyedMass) }}</td>
+        <td>{% if (c.mass) != 0 %}{{ '%0.2f' % (100.0 * c.destroyedMass / c.mass ) }}{% else %}0.00{% endif %}</td>
+    </tr>
+    {% endfor %}
+</table>
+<br />
+<div class="shrd">Статистика по расам</div>
+<table class="nob">
+    {% for r in raceStats %}
+    <tr>
+        <td>
+            <table class="b" style="width:100%;">
+                <tr class="tableHeader">
+                    <td style="width:250px;">Имя</td>
+                    <td style="width:100px;">DT</td>
+                    <td style="width:100px;">WT</td>
+                    <td style="width:100px;">ST</td>
+                    <td style="width:100px;">CT</td>
+                    <td style="width:100px;">Pop</td>
+                    <td style="width:100px;">Ind</td>
+                </tr>
+                <tr>
+                    <td>{{ r.name }}</td>
+                    <td>{{ '%0.2f' % r.dt }}{{ showMinorValue(r.dt - r.prevdt) }}</td>
+                    <td>{{ '%0.2f' % r.wt }}{{ showMinorValue(r.wt - r.prevwt) }}</td>
+                    <td>{{ '%0.2f' % r.st }}{{ showMinorValue(r.st - r.prevst) }}</td>
+                    <td>{{ '%0.2f' % r.ct }}{{ showMinorValue(r.ct - r.prevct) }}</td>
+                    <td>{{ '%0.2f' % r.pop }}{{ showMinorValue(r.pop - r.prevpop) }}</td>
+                    <td>{{ '%0.2f' % r.ind }}{{ showMinorValue(r.ind - r.prevind) }}</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <span>{{ '%0.2f' % (r.techSum() - r.prevtechSum()) }} - общий прирост технологий за ход;</span><br />
+            <span>{{ '%0.2f' % (r.ind - r.prevind) }} - общий прирост промышленности за ход;</span>
+        </td>
+    </tr>
+    <tr style="padding-bottom:20px;">
+        <td>
+            <span>Массы:</span><br />
+            <table class="nob" style="margin-left:50px;">
+                <tr>
+                    <td class="r">{{ '%0.2f' % r.massProdused() }}</td>
+                    <td>- Прирост за последний ход</td>
+                </tr>
+                <tr>
+                    <td class="r">{{ '%0.2f' % (r.totalMassProduced() - r.destroyedMass) }}</td>
+                    <td>- Текущая</td>
+                </tr>
+                <tr>
+                    <td class="r">{{ '%0.2f' % r.totalMassProduced() }}</td>
+                    <td>- Произведённая за игру</td>
+                </tr>
+                <tr>
+                    <td class="r">{{ '%0.2f' % r.destroyedMass }}</td>
+                    <td>- Погибшая за игру ({% if (r.totalMassProduced()) != 0 %}{{ '%0.2f' % (100.0*r.destroyedMass/r.totalMassProduced()) }}{% else %}0.00{% endif %}%)</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+</body>
+</html>
