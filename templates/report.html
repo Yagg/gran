@@ -46,7 +46,7 @@
 <br />
 <div class="shrd">Средние уровни технологий на которых команды строят корабли</div>
 <table class="b">
-    <tr class="tableHeader">
+    <tr class="tableHeader c">
         <td>Команда</td>
         <td>Двигатели</td>
         <td>Оружие</td>
@@ -68,7 +68,7 @@
 <br />
 <div class="shrd">Суммарные данные по массе</div>
 <table class="b">
-    <tr class="tableHeader">
+    <tr class="tableHeader c">
         <td>Команда</td>
         <td>Построено</td>
         <td>Погибло</td>
@@ -77,9 +77,9 @@
     {% for c in commandStats %}
     <tr>
         <td>{{ c.commandName }}</td>
-        <td>{{ '%0.2f' % c.mass }}{{ showMinorValue(c.mass - c.prevMass) }}</td>
-        <td>{{ '%0.2f' % c.destroyedMass }}{{ showMinorValue(c.destroyedMass - c.prevDestroyedMass) }}</td>
-        <td>{% if (c.mass) != 0 %}{{ '%0.2f' % (100.0 * c.destroyedMass / c.mass ) }}{% else %}0.00{% endif %}</td>
+        <td class="r">{{ '%0.2f' % c.mass }}{{ showMinorValue(c.mass - c.prevMass) }}</td>
+        <td class="r">{{ '%0.2f' % c.destroyedMass }}{{ showMinorValue(c.destroyedMass - c.prevDestroyedMass) }}</td>
+        <td class="r">{% if (c.mass) != 0 %}{{ '%0.2f' % (100.0 * c.destroyedMass / c.mass ) }}{% else %}0.00{% endif %}</td>
     </tr>
     {% endfor %}
 </table>
@@ -90,7 +90,7 @@
     <tr>
         <td>
             <table class="b" style="width:100%;">
-                <tr class="tableHeader">
+                <tr class="tableHeader c">
                     <td style="width:250px;">Имя</td>
                     <td style="width:100px;">DT</td>
                     <td style="width:100px;">WT</td>
@@ -101,12 +101,12 @@
                 </tr>
                 <tr>
                     <td>{{ r.name }}</td>
-                    <td>{{ '%0.2f' % r.dt }}{{ showMinorValue(r.dt - r.prevdt) }}</td>
-                    <td>{{ '%0.2f' % r.wt }}{{ showMinorValue(r.wt - r.prevwt) }}</td>
-                    <td>{{ '%0.2f' % r.st }}{{ showMinorValue(r.st - r.prevst) }}</td>
-                    <td>{{ '%0.2f' % r.ct }}{{ showMinorValue(r.ct - r.prevct) }}</td>
-                    <td>{{ '%0.2f' % r.pop }}{{ showMinorValue(r.pop - r.prevpop) }}</td>
-                    <td>{{ '%0.2f' % r.ind }}{{ showMinorValue(r.ind - r.prevind) }}</td>
+                    <td class="r">{{ '%0.2f' % r.dt }}{{ showMinorValue(r.dt - r.prevdt) }}</td>
+                    <td class="r">{{ '%0.2f' % r.wt }}{{ showMinorValue(r.wt - r.prevwt) }}</td>
+                    <td class="r">{{ '%0.2f' % r.st }}{{ showMinorValue(r.st - r.prevst) }}</td>
+                    <td class="r">{{ '%0.2f' % r.ct }}{{ showMinorValue(r.ct - r.prevct) }}</td>
+                    <td class="r">{{ '%0.2f' % r.pop }}{{ showMinorValue(r.pop - r.prevpop) }}</td>
+                    <td class="r">{{ '%0.2f' % r.ind }}{{ showMinorValue(r.ind - r.prevind) }}</td>
                 </tr>
             </table>
         </td>
@@ -117,7 +117,7 @@
             <span>{{ '%0.2f' % (r.ind - r.prevind) }} - общий прирост промышленности за ход;</span>
         </td>
     </tr>
-    <tr style="padding-bottom:20px;">
+    <tr>
         <td>
             <span>Массы:</span><br />
             <table class="nob" style="margin-left:50px;">
@@ -140,6 +140,51 @@
             </table>
         </td>
     </tr>
+    {% if r.shipStats %}
+    <tr>
+        <td style="padding-left:50px;">
+            {{ '%0.2f' % r.totalSeenMass }} - Не сбитая масса, которую мы видели
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Деталировка виденной массы:
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <table class="b">
+                <tr class="tableHeader c">
+                    <td>Тип</td>
+                    <td>Вес</td>
+                    <td>Количество</td>
+                    <td>D</td>
+                    <td>A</td>
+                    <td>W</td>
+                    <td>S</td>
+                    <td>C</td>
+                    <td>Построено</td>
+                    <td>Сбито</td>
+                </tr>
+                {% for ss in r.shipStats %}
+                <tr>
+                    <td>{{ ss.shipType.name }}</td>
+                    <td class="r">{{ '%0.2f' % ss.shipType.shipMass() }}</td>
+                    <td class="r">{{ '%d' % ss.liveCount() }}</td>
+                    <td class="r">{{ '%0.2f' % ss.shipType.drive }}</td>
+                    <td class="r">{{ '%d' % ss.shipType.ammo }}</td>
+                    <td class="r">{{ '%0.2f' % ss.shipType.weapon }}</td>
+                    <td class="r">{{ '%0.2f' % ss.shipType.shield }}</td>
+                    <td class="r">{{ '%0.2f' % ss.shipType.cargo }}</td>
+                    <td class="r">{{ '%d' % ss.seenCount }}</td>
+                    <td class="r">{{ '%d' % ss.destroyedCount }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </td>
+    </tr>
+    {% endif %}
+    <tr><td style="height:40px;"></td></tr>
     {% endfor %}
 </table>
 </body>

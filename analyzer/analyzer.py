@@ -5,6 +5,7 @@ from jinja2 import Environment, PackageLoader
 
 from commandStats import CommandStats
 from raceStats import RaceStats
+from shipStats import ShipStats
 
 class Analyzer:
     def __init__(self, reports):
@@ -76,7 +77,16 @@ class Analyzer:
             self.collectShips(raceName, stats)
         return sorted(res, key=lambda r: r.name)
 
-    def analyzeBattles(self, stats):
+    def addGroupToList(self, list, shipType, cnt):
+        found = False
+        for idx, item in enumerate(list):
+            if item[0] == shipType:
+                list[idx] = (shipType, item[1]+cnt)
+                found = True
+        if not found:
+            list.append((shipType, cnt))
+
+    def analyzeShipGroups(self, stats):
         race = self.firstRep.getReportRace()
         for r in self.zippedReports:
             rr = r[0].getRace(race.name)
@@ -88,13 +98,52 @@ class Analyzer:
                 destroyedGroups = [(g.ownerName, g.shipType, g.count - g.liveCount)
                                  for g in flGroups if g.count > g.liveCount]
                 for (oname, grName, cnt) in destroyedGroups:
-                    raceStats = filter(lambda sr: sr.name == oname, stats)[0]
-                    raceGroup = filter(lambda gr: gr.name == grName, r[0].getRace(oname).shipTypes)[0]
-                    raceStats.destroyedMass = raceStats.destroyedMass + raceGroup.weight * cnt
+                    raceStat = filter(lambda sr: sr.name == oname, stats)[0]
+                    shipType = filter(lambda gr: gr.name == grName, r[0].getRace(oname).shipTypes)[0]
+                    raceStat.destroyedMass = raceStat.destroyedMass + shipType.weight * cnt
+                    self.addGroupToList(raceStat.destroyedGroups, shipType, cnt)
+
+        for (rep, prevRep) in self.zippedReports:
+            for raceStat in stats:
+                race = rep.getRace(raceStat.name)
+                grp = self.getGroupsDiff(raceStat.seenGroups, race, raceStat.destroyedGroups)
+                for (shipType, cnt) in grp:
+                    self.addGroupToList(raceStat.seenGroups, shipType, cnt)
+                raceStat.lastGroupsDiff = grp
+
+    def getGroupsDiff(self, seenGroups, race, destroyedGroups):
+        thisTurnGroups = race.groups
+        ttgSumm = []
+        for g in thisTurnGroups:
+            shipType = filter(lambda gr: gr.name == g.shipType, race.shipTypes)[0]
+            self.addGroupToList(ttgSumm, shipType, g.count)
+
+        diff = []
+        for g in ttgSumm:
+            seenBefore = filter(lambda sg: sg[0] == g[0], seenGroups)
+            seenCnt = 0 if not seenBefore else seenBefore[0][1]
+
+            destroyed = filter(lambda sg: sg[0] == g[0], destroyedGroups)
+            destrCnt = 0 if not destroyed else destroyed[0][1]
+
+            if seenCnt - destrCnt < g[1]:
+                self.addGroupToList(diff, g[0], g[1] - (seenCnt - destrCnt))
+
+        return diff
+
+    def prepareShipGroupsForTemplate(self, raceStats):
+        for rs in raceStats:
+            for sgr in rs.seenGroups:
+                destroyed = filter(lambda dg: dg[0] == sgr[0], rs.destroyedGroups)
+                destrCnt = 0 if not destroyed else destroyed[0][1]
+                rs.shipStats.append(ShipStats(sgr[0], sgr[1], destrCnt))
+            rs.shipStats = sorted(rs.shipStats, key=lambda ss: ss.shipType.shipMass(), reverse=True)
+            rs.totalSeenMass = sum([ss.liveCount()*ss.shipType.shipMass() for ss in rs.shipStats])
 
     def run(self):
         raceStats = self.prepareRacesStatisticsForTemplate()
-        self.analyzeBattles(raceStats)
+        self.analyzeShipGroups(raceStats)
+        self.prepareShipGroupsForTemplate(raceStats)
         commandStats = self.prepareCommandStatisticsForTemplate()
         for cs in commandStats:
             cs.destroyedMass = sum([rs.destroyedMass for rs in raceStats if self.command(rs.name) == cs.commandName])

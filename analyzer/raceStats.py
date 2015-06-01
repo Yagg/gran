@@ -19,13 +19,20 @@ class RaceStats:
         self.prevpop = 0
         self.prevind = 0
 
+        self.prevdestroyedMass = 0
         self.prevTotalMass = 0
         self.destroyedMass = 0
-        self.prevdestroyedMass = 0
 
         self.sumL = 0
         self.sumIndDiff = 0
         self.sumTechDiff = 0
+
+        self.destroyedGroups = []
+        self.seenGroups = []
+        self.lastGroupsDiff = []
+
+        self.shipStats = []
+        self.totalSeenMass = 0
 
     def totalMassProduced(self):
         val = (self.sumL - 2000 - (self.sumIndDiff * 5) - (self.sumTechDiff * 5000)) / (10.0 + 1.0/10.0)
@@ -75,7 +82,7 @@ class RaceStats:
 
     def LSpentToInd(self):
         indDiff = self.ind - self.prevind
-        return (indDiff if indDiff>0 else 0)* 5  # (5.0 + 1.0/10.0)
+        return (indDiff if indDiff > 0 else 0) * 5  # (5.0 + 1.0/10.0)
 
     def LSpentToMass(self):
         l = self.calcL() - self.LSpentToTech() - self.LSpentToInd()
