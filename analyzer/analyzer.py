@@ -3,6 +3,7 @@ __author__ = 'Yagg'
 
 from jinja2 import Environment, PackageLoader
 
+from utils import *
 from commandStats import CommandStats
 from raceStats import RaceStats
 from shipStats import ShipStats
@@ -68,7 +69,7 @@ class Analyzer:
 
     def prepareRacesStatisticsForTemplate(self):
         res = []
-        for raceName in [item for sublist in self.commandRaces for item in sublist]:
+        for raceName in flatten(self.commandRaces):
             stats = RaceStats(raceName)
             r = self.lastRep.getRace(raceName)
             pr = self.prevRep.getRace(raceName)
@@ -94,7 +95,7 @@ class Analyzer:
                 rs.prevdestroyedMass = rs.destroyedMass
             battles = rr.battles
             for b in battles:
-                flGroups = [item for sublist in b.groups for item in sublist]  # flatten groups
+                flGroups = flatten(b.groups)
                 destroyedGroups = [(g.ownerName, g.shipType, g.count - g.liveCount)
                                  for g in flGroups if g.count > g.liveCount]
                 for (oname, grName, cnt) in destroyedGroups:
