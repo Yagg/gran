@@ -129,6 +129,8 @@ class Analyzer:
 
             if seenCnt - destrCnt < g[1]:
                 self.addGroupToList(diff, g[0], g[1] - (seenCnt - destrCnt))
+            else:
+                self.addGroupToList(diff, g[0], 0)  # update shipType name
 
         return diff
 
