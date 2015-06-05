@@ -1,6 +1,4 @@
 # -*- coding: utf_8 -*-
-import sys
-
 __author__ = 'Yagg'
 
 from jinja2 import Environment, PackageLoader

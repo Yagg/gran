@@ -58,7 +58,7 @@
         <td>Грузы</td>
         <td>Боеспособных рас</td>
     </tr>
-    {% for c in commandStats %}
+    {% for c in commandStats if c.cnt > 0 %}
     <tr>
         <td>{{ c.commandName }}</td>
         <td>{{ '%0.2f' % (c.dt / c.cnt) }}{{ showMinorValue(c.dt / c.cnt - c.prevdt / c.prevcnt) }}</td>
