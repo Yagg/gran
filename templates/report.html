@@ -20,6 +20,10 @@
             border:none;
             outline:none;
         }
+        .hint
+        {
+            text-size: 5px;
+        }
     </style>
     {% macro showMinorValue(value) -%}
     {% if (value) != 0 %}<span class="minorText">({{ '%0.2f' % (value) }})</span>{% endif %}
@@ -87,13 +91,32 @@
 </table>
 <br />
 <div class="shrd">Статистика по расам</div>
+{% set num = 0 %}
+{% set li = (raceStats|length - 1) %}
+<table class="b">
+    <tr class="tableHeader c">
+        <td colspan="6">Имя</td>
+    </tr>
+    {% for r in raceStats %}
+    {% if num % 6 == 0 %}
+        {% if num>1 %}</tr>{% endif %}
+    <tr>
+    {% endif %}
+        <td><a href="#{{ r.name }}" {% if (r.totalMassProduced() - r.destroyedMass - r.totalSeenMass) > 500 %}style="color:red;"{% endif %}>{{ r.name }}</a></td>
+    {% set num = num + 1 %}
+    {% endfor %}
+</table>
+<span class='hint'>Красным выделены расы, у которых невидимая масса больше 500</span>
+<br />
+<br />
+<br />
 <table class="nob">
     {% for r in raceStats %}
     <tr>
         <td>
             <table class="b" style="width:100%;">
                 <tr class="tableHeader c">
-                    <td style="width:250px;">Имя</td>
+                    <td style="width:250px;"><a id="{{ r.name }}">Имя</a></td>
                     <td style="width:100px;">DT</td>
                     <td style="width:100px;">WT</td>
                     <td style="width:100px;">ST</td>
