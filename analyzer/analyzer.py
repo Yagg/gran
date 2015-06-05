@@ -100,49 +100,26 @@ class Analyzer:
                 flGroups = flatten(b.groups)
                 destroyedGroups = [(g.ownerName, g.shipType, g.count - g.liveCount)
                                  for g in flGroups if g.count > g.liveCount]
-                liveGroups = [(g.ownerName, g.shipType, g.liveCount)
-                                   for g in flGroups if g.liveCount > 0]
                 for (oname, grName, cnt) in destroyedGroups:
                     raceStat = filter(lambda sr: sr.name == oname, stats)[0]
                     shipType = filter(lambda gr: gr.name == grName, r[0].getRace(oname).shipTypes)[0]
                     raceStat.destroyedMass = raceStat.destroyedMass + shipType.weight * cnt
                     self.addGroupToList(raceStat.destroyedGroups, shipType, cnt)
 
-                for (oname, grName, cnt) in liveGroups:
-                    lgRace = r[0].getRace(oname)
-                    raceStat = filter(lambda sr: sr.name == oname, stats)[0]
-                    shipType = filter(lambda gr: gr.name == grName, lgRace.shipTypes)[0]
-                    self.addGroupToList(raceStat.liveGroups, shipType, cnt)
-
         for (rep, prevRep) in self.zippedReports:
             for raceStat in stats:
                 race = rep.getRace(raceStat.name)
-                grp = self.getGroupsDiff(raceStat.seenGroups, race, raceStat.destroyedGroups, raceStat.liveGroups)
+                grp = self.getGroupsDiff(raceStat.seenGroups, race, raceStat.destroyedGroups)
                 for (shipType, cnt) in grp:
                     self.addGroupToList(raceStat.seenGroups, shipType, cnt)
                 raceStat.lastGroupsDiff = grp
 
-    def getGroupsDiff(self, seenGroups, race, destroyedGroups, liveGroups):
-        battleGroups = []
-        for (st, cnt) in destroyedGroups:
-            shipType = filter(lambda gr: gr.name == st.name, race.shipTypes)
-            if shipType:
-                self.addGroupToList(battleGroups, shipType[0], cnt)
-        for (st, cnt) in liveGroups:
-            shipType = filter(lambda gr: gr.name == st.name, race.shipTypes)
-            if shipType:
-                self.addGroupToList(battleGroups, shipType[0], cnt)
-
+    def getGroupsDiff(self, seenGroups, race, destroyedGroups):
         thisTurnGroups = race.groups
         ttgSumm = []
         for g in thisTurnGroups:
             shipType = filter(lambda gr: gr.name == g.shipType, race.shipTypes)[0]
             self.addGroupToList(ttgSumm, shipType, g.count)
-
-        for (st, cnt) in battleGroups:
-            exInGroupsSect = filter(lambda sg: sg[0] == st, ttgSumm)
-            egsCnt = 0 if exInGroupsSect and exInGroupsSect[0].count > cnt else cnt
-            self.addGroupToList(ttgSumm, st, egsCnt)
 
         diff = []
         for g in ttgSumm:

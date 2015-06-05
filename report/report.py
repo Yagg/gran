@@ -35,7 +35,7 @@ class Report:
             'Ships In Production': self.parseProdShips,
             '(\S+)\s+Groups': self.parseGroups,
             'Broadcast Message': self.skipSection,
-            'Battle at \((\S+)\)': self.parseBattle,
+            'Battle at \((\S+)\)\s+(\S+)': self.parseBattle,
             'Bombings': self.parseBombings,
             'Incoming Groups': self.parseIncoming,
             '(\S+)\s+Routes': self.parseRoutes,
@@ -256,7 +256,7 @@ class Report:
                                            '\s*(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)',
                                            actionAlien, False)
 
-    def parseBattleGroups(self, strings, line):
+    def parseBattleGroups(self, strings, line, battle):
         m = re.search('(\S+)\s+Groups', line)
         if not m:
             return False, line, None
@@ -275,6 +275,10 @@ class Report:
             st.liveCount = int(m.group(9))
             st.battleStatus = m.group(10)
             gr.append(st)
+            if st.liveCount > 0:
+                grp = filter(lambda gr: gr.shipType == st.shipType and battle.planetName == gr.destinationPlanet, race.groups)
+                if not grp:
+                    race.groups.append(st)
 
         stat, rline = self.commonSectionParse(strings,
                                               '(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)',
@@ -302,7 +306,7 @@ class Report:
         return True, rline, proto
 
     def parseBattle(self, strings, rem, sectionheader):
-        battle = Battle(rem.group(1))
+        battle = Battle(rem.group(1), rem.group(2))
 
         while True:
             line = strings.readline()  # battle section header
@@ -313,7 +317,7 @@ class Report:
                 battle.protocol = bp
                 break
             else:
-                status, pline, gr = self.parseBattleGroups(strings, line)
+                status, pline, gr = self.parseBattleGroups(strings, line, battle)
                 if not status:
                     return False, pline
                 battle.groups.append(gr)
