@@ -56,6 +56,5 @@ docs/_build/
 # PyBuilder
 target/
 
-.idea/workspace.xml
-.idea/vcs.xml
-.idea/misc.xml
+.idea
+gran.iml
