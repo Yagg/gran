@@ -20,7 +20,7 @@ class Analyzer:
 
     def command(self, race):
         a = race.partition('_')
-        return a[0]
+        return race if len(a) == 1 else a[0]
 
     def calcCommandStat(self, raceNames, commandName):
         sum = CommandStats(commandName)
@@ -54,7 +54,7 @@ class Analyzer:
             commandName = self.command(cmd[0])
             sum = self.calcCommandStat(cmd, commandName)
             commandStats.append(sum)
-        return sorted(commandStats, key=lambda s: s.commandName)
+        return sorted(commandStats, key=lambda s: s.commandName.lower())
 
     def collectShips(self, raceName, stats):
         for r in self.zippedReports:
@@ -76,7 +76,7 @@ class Analyzer:
             stats.initFromRace(r, pr)
             res.append(stats)
             self.collectShips(raceName, stats)
-        return sorted(res, key=lambda r: r.name)
+        return sorted(res, key=lambda r: r.name.lower())
 
     def addGroupToList(self, list, shipType, cnt):
         found = False
