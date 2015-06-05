@@ -1,4 +1,6 @@
 # -*- coding: utf_8 -*-
+import sys
+
 __author__ = 'Yagg'
 
 from jinja2 import Environment, PackageLoader
@@ -121,15 +123,25 @@ class Analyzer:
                 raceStat.lastGroupsDiff = grp
 
     def getGroupsDiff(self, seenGroups, race, destroyedGroups, liveGroups):
+        battleGroups = []
+        for (st, cnt) in destroyedGroups:
+            shipType = filter(lambda gr: gr.name == st.name, race.shipTypes)
+            if shipType:
+                self.addGroupToList(battleGroups, shipType[0], cnt)
+        for (st, cnt) in liveGroups:
+            shipType = filter(lambda gr: gr.name == st.name, race.shipTypes)
+            if shipType:
+                self.addGroupToList(battleGroups, shipType[0], cnt)
+
         thisTurnGroups = race.groups
         ttgSumm = []
         for g in thisTurnGroups:
             shipType = filter(lambda gr: gr.name == g.shipType, race.shipTypes)[0]
             self.addGroupToList(ttgSumm, shipType, g.count)
 
-        for (st, cnt) in liveGroups:
+        for (st, cnt) in battleGroups:
             exInGroupsSect = filter(lambda sg: sg[0] == st, ttgSumm)
-            egsCnt = 0 if exInGroupsSect and exInGroupsSect[0].count>cnt else cnt
+            egsCnt = 0 if exInGroupsSect and exInGroupsSect[0].count > cnt else cnt
             self.addGroupToList(ttgSumm, st, egsCnt)
 
         diff = []
