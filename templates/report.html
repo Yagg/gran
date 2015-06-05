@@ -71,6 +71,7 @@
     <tr class="tableHeader c">
         <td>Команда</td>
         <td>Построено</td>
+        <td>Видно</td>
         <td>Погибло</td>
         <td>Процент погибших</td>
     </tr>
@@ -78,6 +79,7 @@
     <tr>
         <td>{{ c.commandName }}</td>
         <td class="r">{{ '%0.2f' % c.mass }}{{ showMinorValue(c.mass - c.prevMass) }}</td>
+        <td class="r">{{ '%0.2f' % c.visibleMass }}</td>
         <td class="r">{{ '%0.2f' % c.destroyedMass }}{{ showMinorValue(c.destroyedMass - c.prevDestroyedMass) }}</td>
         <td class="r">{% if (c.mass) != 0 %}{{ '%0.2f' % (100.0 * c.destroyedMass / c.mass ) }}{% else %}0.00{% endif %}</td>
     </tr>

@@ -26,3 +26,4 @@ class CommandStats:
         self.destroyedMass = 0
         self.prevMass = 0
         self.prevDestroyedMass = 0
+        self.visibleMass = 0
