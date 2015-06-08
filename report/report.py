@@ -33,11 +33,11 @@ class Report:
             'Map around': self.skipSection,
             '(\S+)\s+Planets': self.parsePlanets,
             'Ships In Production': self.parseProdShips,
+            'Incoming Groups': self.parseIncoming,
             '(\S+)\s+Groups': self.parseGroups,
             'Broadcast Message': self.skipSection,
             'Battle at \((\S+)\)\s+(\S+)': self.parseBattle,
             'Bombings': self.parseBombings,
-            'Incoming Groups': self.parseIncoming,
             '(\S+)\s+Routes': self.parseRoutes,
             '(\S+)\s+Fleets': self.parseFleets,
             'Role state': self.skipSection
@@ -103,7 +103,7 @@ class Report:
                     found = True
                     res = self.sectionTable[r](strings, sm, sectionheader)
                     if not res[0]:
-                        print >> sys.stderr, 'Error in section %s', sectionheader
+                        print >> sys.stderr, 'Error in section %s' % sectionheader
                         if res[1]:
                             print >> sys.stderr, '   with line:\n%s' % res[1]
                         return False
