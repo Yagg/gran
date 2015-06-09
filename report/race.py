@@ -15,6 +15,7 @@ class Race:
 
         self.shipTypes = []
         self.groups = []
+        self.battleGroups = []
         self.battles = []
         self.sciences = []
         self.incomings = []

@@ -20,8 +20,10 @@ class Report:
         self.turn = 0
         self.gamename = ''
         self.galaxysize = 0
-        self.planets = 0
+        self.planetsNum = 0
         self.players = 0
+
+        self.planets = []
 
         self.races = []
 
@@ -76,7 +78,7 @@ class Report:
         m = re.search('Size:\s+(\S+)\s+Planets:\s+(\S+)\s+Players:\s+(\S+)', galinfo)
         if m:
             self.galaxysize = float(m.group(1))
-            self.planets = int(m.group(2))
+            self.planetsNum = int(m.group(2))
             self.players = int(m.group(3))
         else:
             print >> sys.stderr, 'Wrong galaxy info'
@@ -112,6 +114,11 @@ class Report:
                 print >> sys.stderr, 'Not found parser for section %s' % sectionheader
                 self.skipSection(strings, None, sectionheader)
 
+        for race in self.races:
+            for st in race.battleGroups:
+                grp = filter(lambda gr: gr.shipType == st.shipType and st.destinationPlanet == gr.destinationPlanet, race.groups)
+                if not grp:
+                    race.groups.append(st)
         return True
 
     def skipSection(self, strings, rem, sectionheader):
@@ -211,10 +218,26 @@ class Report:
         return self.skipSection(strings, rem, sectionheader)
 
     def parseUninhabitedPlanets(self, strings, rem, sectionheader):
-        return self.skipSection(strings, rem, sectionheader)
+        def action(m):
+            st = Planet(int(m.group(1)), float(m.group(2)), float(m.group(3)), m.group(4), float(m.group(5)),
+                        0, 0, float(m.group(6)), '', float(m.group(7)),
+                        float(m.group(8)), 0)
+            self.planets.append(st)
+
+        return self.commonSectionParse(strings,
+                                       '\s*(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)',
+                                       action)
 
     def parseUnidentifiedPlanets(self, strings, rem, sectionheader):
-        return self.skipSection(strings, rem, sectionheader)
+        def action(m):
+            st = Planet(int(m.group(1)), float(m.group(2)), float(m.group(3)), '', 0,
+                        0, 0, 0, '', 0,
+                        0, 0)
+            self.planets.append(st)
+
+        return self.commonSectionParse(strings,
+                                       '\s*(\S+)\s+(\S+)\s+(\S+)',
+                                       action)
 
     def parseGroups(self, strings, rem, sectionheader):
         if rem.group(1) == 'Unidentified':
@@ -274,11 +297,9 @@ class Report:
                            float(m.group(6)), m.group(7), float(m.group(8)))
             st.liveCount = int(m.group(9))
             st.battleStatus = m.group(10)
+            st.destinationPlanet = battle.planetName
             gr.append(st)
-            if st.liveCount > 0:
-                grp = filter(lambda gr: gr.shipType == st.shipType and battle.planetName == gr.destinationPlanet, race.groups)
-                if not grp:
-                    race.groups.append(st)
+            race.battleGroups.append(st)
 
         stat, rline = self.commonSectionParse(strings,
                                               '(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)',
