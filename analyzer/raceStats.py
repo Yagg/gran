@@ -27,6 +27,7 @@ class RaceStats:
         self.sumIndDiff = 0
         self.sumTechDiff = 0
 
+        self.destroyedGroupsByTurn = []
         self.destroyedGroups = []
         self.liveGroups = []
         self.seenGroups = []

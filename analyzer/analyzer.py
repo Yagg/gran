@@ -103,11 +103,14 @@ class Analyzer:
                     shipType = filter(lambda gr: gr.name == grName, r[0].getRace(oname).shipTypes)[0]
                     raceStat.destroyedMass = raceStat.destroyedMass + shipType.weight * cnt
                     self.addGroupToList(raceStat.destroyedGroups, shipType, cnt)
+            for rs in stats:
+                rs.destroyedGroupsByTurn.append((r[0].turn, list(rs.destroyedGroups)))
 
         for (rep, prevRep) in self.zippedReports:
             for raceStat in stats:
                 race = rep.getRace(raceStat.name)
-                grp = self.getGroupsDiff(raceStat.seenGroups, race, raceStat.destroyedGroups)
+                dg = filter(lambda g: g[0]==rep.turn, raceStat.destroyedGroupsByTurn)[0]
+                grp = self.getGroupsDiff(raceStat.seenGroups, race, dg[1])
                 for (shipType, cnt) in grp:
                     self.addGroupToList(raceStat.seenGroups, shipType, cnt)
                 raceStat.lastGroupsDiff = grp
@@ -117,18 +120,18 @@ class Analyzer:
         ttgSumm = []
         for g in thisTurnGroups:
             shipType = filter(lambda gr: gr.name == g.shipType, race.shipTypes)[0]
-            self.addGroupToList(ttgSumm, shipType, g.count)
+            self.addGroupToList(ttgSumm, shipType, g.count if g.battleStatus == '' else g.liveCount)
 
         diff = []
         for g in ttgSumm:
             seenBefore = filter(lambda sg: sg[0] == g[0], seenGroups)
             seenCnt = 0 if not seenBefore else seenBefore[0][1]
 
-            destroyed = filter(lambda sg: sg[0] == g[0], destroyedGroups)
-            destrCnt = 0 if not destroyed else destroyed[0][1]
+            destroyedAll = filter(lambda sg: sg[0] == g[0], destroyedGroups)
+            destroyedAllCnt = 0 if not destroyedAll else destroyedAll[0][1]
 
-            if seenCnt - destrCnt < g[1]:
-                self.addGroupToList(diff, g[0], g[1] - (seenCnt - destrCnt))
+            if g[1] + destroyedAllCnt > seenCnt:
+                self.addGroupToList(diff, g[0], g[1] + destroyedAllCnt - seenCnt)
             else:
                 self.addGroupToList(diff, g[0], 0)  # update shipType name
 
@@ -159,4 +162,3 @@ class Analyzer:
         template = env.get_template('report.html')
         res = template.render(commandStats=commandStats, raceStats=raceStats)
         print res.encode('utf-8')
-
