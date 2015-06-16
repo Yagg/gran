@@ -160,5 +160,6 @@ class Analyzer:
 
         env = Environment(loader=PackageLoader('gran', 'templates'))
         template = env.get_template('report.html')
-        res = template.render(commandStats=commandStats, raceStats=raceStats)
-        print res.encode('utf-8')
+        res = template.render(commandStats=commandStats, raceStats=raceStats, turn=self.lastRep.turn)
+        f = open('turn%03d.xhtml' % self.lastRep.turn, 'w')
+        print >> f, res.encode('utf-8')

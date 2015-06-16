@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <style type="text/css">
         .minorText{color:#bababa;}
         .b, .b tr, .b td{border-collapse: collapse !important; border: 1px solid black !important; padding: 5px;}
@@ -30,6 +30,11 @@
     {%- endmacro %}
 </head>
 <body>
+<table>
+    <tr>
+{% if (turn>0) %}<td><a href="./turn{{ '%03d' % (turn-1) }}.xhtml">Prev turn</a></td>{% endif %}<td><a href="./turn{{ '%03d' % (turn+1) }}.xhtml">Next turn</a></td>
+    </tr>
+</table>
 <div class="shrd">Суммарные данные по командам</div>
 <table class="b">
     <tr class="tableHeader">
@@ -40,7 +45,7 @@
     </tr>
     {% for c in commandStats %}
     <tr>
-        <td>{{ c.commandName }}</td>
+        <td>{{ c.commandName|e }}</td>
         <td>{{ '%0.2f' % c.pop }}{{ showMinorValue(c.pop - c.prevpop) }}</td>
         <td>{{ '%0.2f' % c.ind }}{{ showMinorValue(c.ind - c.prevind) }}</td>
         <td>{{ '%0.2f' % c.rating }}{{ showMinorValue(c.rating - c.prevrating) }}</td>
@@ -60,7 +65,7 @@
     </tr>
     {% for c in commandStats if c.cnt > 0 %}
     <tr>
-        <td>{{ c.commandName }}</td>
+        <td>{{ c.commandName|e }}</td>
         <td>{{ '%0.2f' % (c.dt / c.cnt) }}{{ showMinorValue(c.dt / c.cnt - c.prevdt / c.prevcnt) }}</td>
         <td>{{ '%0.2f' % (c.wt / c.cnt) }}{{ showMinorValue(c.wt / c.cnt - c.prevwt / c.prevcnt) }}</td>
         <td>{{ '%0.2f' % (c.st / c.cnt) }}{{ showMinorValue(c.st / c.cnt - c.prevst / c.prevcnt) }}</td>
@@ -81,7 +86,7 @@
     </tr>
     {% for c in commandStats %}
     <tr>
-        <td>{{ c.commandName }}</td>
+        <td>{{ c.commandName|e }}</td>
         <td class="r">{{ '%0.2f' % c.mass }}{{ showMinorValue(c.mass - c.prevMass) }}</td>
         <td class="r">{{ '%0.2f' % c.visibleMass }}</td>
         <td class="r">{{ '%0.2f' % c.destroyedMass }}{{ showMinorValue(c.destroyedMass - c.prevDestroyedMass) }}</td>
@@ -105,6 +110,7 @@
         <td><a href="#{{ r.name }}" {% if (r.totalMassProduced() - r.destroyedMass - r.totalSeenMass) > 500 %}style="color:red;"{% endif %}>{{ r.name }}</a></td>
     {% set num = num + 1 %}
     {% endfor %}
+    </tr>
 </table>
 <span class='hint'>Красным выделены расы, у которых невидимая масса больше 500</span>
 <br />
@@ -116,7 +122,7 @@
         <td>
             <table class="b" style="width:100%;">
                 <tr class="tableHeader c">
-                    <td style="width:250px;"><a id="{{ r.name }}">Имя</a></td>
+                    <td style="width:250px;"><a id="{{ r.name|e }}">Имя</a></td>
                     <td style="width:100px;">DT</td>
                     <td style="width:100px;">WT</td>
                     <td style="width:100px;">ST</td>
@@ -193,7 +199,7 @@
                 </tr>
                 {% for ss in r.shipStats %}
                 <tr>
-                    <td>{{ ss.shipType.name }}</td>
+                    <td>{{ ss.shipType.name|e }}</td>
                     <td class="r">{{ '%0.2f' % ss.shipType.shipMass() }}</td>
                     <td class="r">{{ '%d' % ss.liveCount() }}</td>
                     <td class="r">{{ '%0.2f' % ss.shipType.drive }}</td>
