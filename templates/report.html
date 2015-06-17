@@ -32,7 +32,9 @@
 <body>
 <table>
     <tr>
-{% if (turn>0) %}<td><a href="./turn{{ '%03d' % (turn-1) }}.xhtml">Prev turn</a></td>{% endif %}<td><a href="./turn{{ '%03d' % (turn+1) }}.xhtml">Next turn</a></td>
+{% if (turn>0) %}<td><a href="./turn{{ '%03d' % (turn-1) }}.xhtml">Предыдущий</a></td>{% endif %}
+        <td><h1>Ход {{ turn }}</h1></td>
+        <td><a href="./turn{{ '%03d' % (turn+1) }}.xhtml">Следующий</a></td>
     </tr>
 </table>
 <div class="shrd">Суммарные данные по командам</div>
