@@ -198,6 +198,7 @@
                     <td>C</td>
                     <td>Построено</td>
                     <td>Сбито</td>
+                    <td>Изменение за ход</td>
                 </tr>
                 {% for ss in r.shipStats %}
                 <tr>
@@ -211,6 +212,11 @@
                     <td class="r">{{ '%0.2f' % ss.shipType.cargo }}</td>
                     <td class="r">{{ '%d' % ss.seenCount }}</td>
                     <td class="r">{{ '%d' % ss.destroyedCount }}</td>
+                    <td class="r">
+                        {% if(ss.diff!=0) %}
+                        {{ '%d' % ss.diff }}
+                        {% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
             </table>

@@ -114,6 +114,12 @@ class Analyzer:
                 for (shipType, cnt) in grp:
                     self.addGroupToList(raceStat.seenGroups, shipType, cnt)
                 raceStat.lastGroupsDiff = grp
+                dgP = filter(lambda g: g[0]==rep.turn-1, raceStat.destroyedGroupsByTurn)
+                if dgP:
+                    for (shipType, cnt) in dg[1]:
+                        self.addGroupToList(raceStat.lastGroupsDiff, shipType, -cnt)
+                    for (shipType, cnt) in dgP[0][1]:
+                        self.addGroupToList(raceStat.lastGroupsDiff, shipType, cnt)
 
     def getGroupsDiff(self, seenGroups, race, destroyedGroups):
         thisTurnGroups = race.groups
@@ -142,7 +148,8 @@ class Analyzer:
             for sgr in rs.seenGroups:
                 destroyed = filter(lambda dg: dg[0] == sgr[0], rs.destroyedGroups)
                 destrCnt = 0 if not destroyed else destroyed[0][1]
-                rs.shipStats.append(ShipStats(sgr[0], sgr[1], destrCnt))
+                diffCnt = filter(lambda dg: dg[0] == sgr[0], rs.lastGroupsDiff)
+                rs.shipStats.append(ShipStats(sgr[0], sgr[1], destrCnt, 0 if not diffCnt else diffCnt[0][1]))
             rs.shipStats = sorted(rs.shipStats, key=lambda ss: ss.shipType.shipMass(), reverse=True)
             rs.totalSeenMass = sum([ss.liveCount()*ss.shipType.shipMass() for ss in rs.shipStats])
 
