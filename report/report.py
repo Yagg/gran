@@ -116,7 +116,8 @@ class Report:
 
         for race in self.races:
             for st in race.battleGroups:
-                grp = filter(lambda gr: gr.shipType == st.shipType and st.destinationPlanet == gr.destinationPlanet, race.groups)
+                grp = filter(lambda gr: gr.shipType == st.shipType and st.liveCount == gr.count
+                                        and st.destinationPlanet == gr.destinationPlanet, race.groups)
                 if not grp:
                     race.groups.append(st)
         return True
