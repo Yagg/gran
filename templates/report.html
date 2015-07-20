@@ -24,6 +24,7 @@
         {
             text-size: 5px;
         }
+        .g{color:#bababa;}
     </style>
     {% macro showMinorValue(value) -%}
     {% if (value) != 0 %}<span class="minorText">({{ '%0.2f' % (value) }})</span>{% endif %}
@@ -201,7 +202,7 @@
                     <td>Изменение за ход</td>
                 </tr>
                 {% for ss in r.shipStats %}
-                <tr>
+                <tr {% if ss.liveCount()==0 %}class="g"{% endif %}>
                     <td>{{ ss.shipType.name|e }}</td>
                     <td class="r">{{ '%0.2f' % ss.shipType.shipMass() }}</td>
                     <td class="r">{{ '%d' % ss.liveCount() }}</td>
