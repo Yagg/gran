@@ -1,7 +1,6 @@
 # -*- coding: utf_8 -*-
 __author__ = 'Yagg'
 
-
 class ShipType:
     def __init__(self, name, drive, ammo, weapon, shield, cargo, weight):
         self.name = name
@@ -19,3 +18,9 @@ class ShipType:
 
     def shipMass(self):
         return self.drive + (self.ammo+1) * self.weapon/2.0 + self.shield + self.cargo
+
+    def isBattleType(self):
+        eps = 0.0001
+        return abs(self.drive-self.weight) < eps \
+               or (abs(self.drive+self.shield-self.weight) < eps) \
+               or (self.ammo > 0 and self.weight > 10)

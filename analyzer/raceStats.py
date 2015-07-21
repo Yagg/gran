@@ -35,6 +35,7 @@ class RaceStats:
 
         self.shipStats = []
         self.totalSeenMass = 0
+        self.totalSeenBattleMass = 0
 
     def totalMassProduced(self):
         val = (self.sumL - 2000 - (self.sumIndDiff * 5) - (self.sumTechDiff * 5000)) / (10.0 + 1.0/10.0)

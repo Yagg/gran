@@ -115,11 +115,20 @@ class Report:
                 self.skipSection(strings, None, sectionheader)
 
         for race in self.races:
+            addLst = []
             for st in race.battleGroups:
                 grp = filter(lambda gr: gr.shipType == st.shipType and st.liveCount == gr.count
                                         and st.destinationPlanet == gr.destinationPlanet, race.groups)
+                gg = filter(lambda gr: gr.shipType == st.shipType
+                                       and st.destinationPlanet == gr.destinationPlanet, race.groups)
                 if not grp:
-                    race.groups.append(st)
+                    if gg:
+                        ggCnt = sum([x.count for x in gg])
+                        if ggCnt <= st.liveCount:
+                            addLst.append(st)
+                    else:
+                        addLst.append(st)
+            race.groups.extend(addLst)
         return True
 
     def skipSection(self, strings, rem, sectionheader):

@@ -152,6 +152,8 @@ class Analyzer:
                 rs.shipStats.append(ShipStats(sgr[0], sgr[1], destrCnt, 0 if not diffCnt else diffCnt[0][1]))
             rs.shipStats = sorted(rs.shipStats, key=lambda ss: ss.shipType.shipMass(), reverse=True)
             rs.totalSeenMass = sum([ss.liveCount()*ss.shipType.shipMass() for ss in rs.shipStats])
+            rs.totalSeenBattleMass = sum([ss.liveCount()*ss.shipType.shipMass() for ss
+                                          in filter(lambda ss2: ss2.shipType.isBattleType(), rs.shipStats)])
 
     def run(self):
         raceStats = self.prepareRacesStatisticsForTemplate()
