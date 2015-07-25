@@ -171,6 +171,12 @@
                     <td class="r">{{ '%0.2f' % r.destroyedMass }}</td>
                     <td>- Погибшая за игру ({% if (r.totalMassProduced()) != 0 %}{{ '%0.2f' % (100.0*r.destroyedMass/r.totalMassProduced()) }}{% else %}0.00{% endif %}%)</td>
                 </tr>
+                {% if (r.totalMassProduced() - r.destroyedMass - r.totalSeenMass) > 0 %}
+                <tr>
+                    <td class="r">{{ '%0.2f' % (r.totalMassProduced() - r.destroyedMass - r.totalSeenMass) }}</td>
+                    <td>- Невидимая масса</td>
+                </tr>
+                {% endif %}
             </table>
         </td>
     </tr>
